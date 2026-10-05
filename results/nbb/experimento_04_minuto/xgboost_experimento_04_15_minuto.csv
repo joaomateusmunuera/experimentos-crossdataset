@@ -1,0 +1,16 @@
+Janela,Acurácia,Desvio Padrão Acurácia,F1-Score,Desvio Padrão F1-Score
+janela_01,0.68,-,0.67,-
+janela_02,0.72,-,0.69,-
+janela_03,0.67,-,0.66,-
+janela_04,0.63,-,0.61,-
+janela_05,0.64,-,0.64,-
+janela_06,0.62,-,0.60,-
+janela_07,0.56,-,0.55,-
+janela_08,0.65,-,0.64,-
+janela_09,0.69,-,0.68,-
+janela_10,0.71,-,0.71,-
+janela_11,0.70,-,0.70,-
+janela_12,0.71,-,0.70,-
+janela_13,0.68,-,0.67,-
+janela_14,0.65,-,0.64,-
+Média Geral,0.66,0.04,0.65,0.04

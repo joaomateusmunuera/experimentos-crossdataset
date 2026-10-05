@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+#Dados das temporadas
+data/
+
 # Distribution / packaging
 .Python
 build/
