@@ -16,7 +16,7 @@ def get_hyper_params_xgboost(X_train, y_train):
     }
 
     # Criar o modelo XGBoost
-    xgb = XGBClassifier(eval_metric='logloss', random_state=42, n_jobs=-2)
+    xgb = XGBClassifier(eval_metric='logloss', random_state=42, n_jobs=10)
 
     # Configurar o Grid Search
     grid_search = GridSearchCV(

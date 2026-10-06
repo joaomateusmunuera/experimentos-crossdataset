@@ -17,7 +17,7 @@ from regressao_logistica_model import run_model_logreg
 # Experimento 5 - Janela Combinatoria (acumulada + intertemporadas) PARA A NBA
 
 # Configurações
-modelos = ['cart_model','svm','xgboost','regressao_logistica'] 
+modelos = ['svm','xgboost','regressao_logistica'] 
 
 # MUDANÇA 1: A primeira temporada (2015-16) é usada como treino base histórico.
 # Portanto, as temporadas de TESTE iniciam a partir de 2016-17.

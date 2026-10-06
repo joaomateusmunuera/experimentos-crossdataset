@@ -9,7 +9,7 @@ def get_hyper_params_svm(X_train, y_train):
     # Ex: 'gamma' não tem efeito no kernel 'linear'.
     # O kernel 'poly' foi removido devido à complexidade computacional absurda em grandes datasets.
     param_grid = [
-        {'kernel': ['linear'], 'C': [0.1, 1, 10]},
+  #      {'kernel': ['linear'], 'C': [0.1, 1, 10]},
         {'kernel': ['rbf'], 'C': [0.1, 1, 10], 'gamma': ['scale', 'auto']}
     ]
 
