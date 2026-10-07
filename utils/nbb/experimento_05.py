@@ -99,7 +99,6 @@ def gerar_arquivos_inter_incremental(temporadas_passadas, temporada_atual, qtd_j
     # 1. Carrega e formata todo o histórico de temporadas passadas
     for temp in temporadas_passadas:
         jogos_temp = get_jogos_temporada(temp)
-        # O formatar_medias vai puxar a conversão por minuto automaticamente através do dados.py
         jogos_temp_fmt = formatar_medias(jogos_temp, True, 15)
         jogos_treino_passados_formatados.extend(descompactar_estatisticas(jogos_temp_fmt))
 
@@ -122,8 +121,7 @@ def gerar_arquivos_inter_incremental(temporadas_passadas, temporada_atual, qtd_j
         # Teste = Apens o jogo de teste do 'indice'
         teste = descompactar_estatisticas([jogos_atual_teste_fmt[indice]])
 
-        # MUDANÇA AQUI: Alterada a pasta de salvamento para experimento_05_minuto
-        final_path = os.path.join(base_path, 'data', 'experimento_05_minuto', temporada_atual, f'{indice}-1')
+        final_path = os.path.join(base_path, 'data', 'experimento_05', temporada_atual, f'{indice}-1')
 
         save_to_csv(treino_completo, f'{final_path}/treino_{num_arquivo}.csv')
         save_to_csv(teste, f'{final_path}/teste_{num_arquivo}.csv')
@@ -142,16 +140,12 @@ if __name__ == "__main__":
         '2022-2023', '2023-2024', '2024-2025'
     ]
 
-    base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..','..'))
     qtd_jogos_base = 15
 
-    print(">> Iniciando a extração do Experimento 05 (Combinatório por Minuto)...")
-    
     # A partir da 2ª temporada (índice 1), a temporada atual ganha o histórico de todas as anteriores
     for i in range(1, len(temporadas)):
         temps_passadas = temporadas[:i]
         temp_atual = temporadas[i]
 
         gerar_arquivos_inter_incremental(temps_passadas, temp_atual, qtd_jogos_base, base_path)
-        
-    print("\n>> Extração por minuto do Experimento 5 finalizada com sucesso!")

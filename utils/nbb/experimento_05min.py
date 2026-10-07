@@ -1,6 +1,7 @@
-import os
 import pandas as pd
-from dados import get_jogos_temporada, formatar_medias
+import os
+from dados import get_jogos_temporada
+from dados import formatar_medias
 
 def save_to_csv(data, filepath):
     df = pd.DataFrame(data)
@@ -88,62 +89,69 @@ def descompactar_estatisticas(jogos):
     return dados_formatados
 
 
-def gerar_arquivos_acumulada_intratemporada(temporadas, base_path, qtd_jogos_base=15):
+def gerar_arquivos_inter_incremental(temporadas_passadas, temporada_atual, qtd_jogos_base, base_path):
     """
-    Gera as bases do Experimento 03 para a NBA (Acurácia Acumulada - Intratemporada).
-    Treino: Inicia com os primeiros N jogos da temporada e cresce +1 a cada iteração.
-    Teste: O jogo exato logo após a janela de treino atual.
+    Gera o treino composto por: (TODAS as temporadas passadas) + (jogos da temporada atual até o índice)
+    E o teste composto por: (apenas o jogo do índice atual)
     """
-    for temporada_atual in temporadas:
-        
-        # 1. Carrega a temporada atual para gerar treino e teste
-        jogos_raw = get_jogos_temporada(temporada_atual)
-        
-        # Ignora temporadas vazias (caso a string da lista não exista no banco)
-        if not jogos_raw:
-            continue
-            
-        jogos_treino_fmt = formatar_medias(jogos_raw, True, qtd_jogos_base)
-        jogos_teste_fmt = formatar_medias(jogos_raw, False, qtd_jogos_base)
+    jogos_treino_passados_formatados = []
 
-        indice = qtd_jogos_base
-        num_arquivo = 1
+    # 1. Carrega e formata todo o histórico de temporadas passadas
+    for temp in temporadas_passadas:
+        jogos_temp = get_jogos_temporada(temp)
+        # O formatar_medias vai puxar a conversão por minuto automaticamente através do dados.py
+        jogos_temp_fmt = formatar_medias(jogos_temp, True, 15)
+        jogos_treino_passados_formatados.extend(descompactar_estatisticas(jogos_temp_fmt))
 
-        print(f"-> Extraindo NBA {temporada_atual} | Total de jogos possíveis: {len(jogos_treino_fmt)}")
+    # 2. Carrega a temporada atual de teste
+    jogos_atual_treino = get_jogos_temporada(temporada_atual)
+    jogos_atual_teste = get_jogos_temporada(temporada_atual)
 
-        # 2. Loop de janela expansiva (Walk-Forward) dentro da temporada
-        while indice < len(jogos_treino_fmt):
-            # Treino = Expande a cada iteração
-            treino_atual = descompactar_estatisticas(jogos_treino_fmt[0:indice])
-            
-            # Teste = Apenas o jogo alvo
-            teste_atual = descompactar_estatisticas([jogos_teste_fmt[indice]])
+    jogos_atual_treino_fmt = formatar_medias(jogos_atual_treino, True, 15)
+    jogos_atual_teste_fmt = formatar_medias(jogos_atual_teste, False, 15)
 
-            # Pasta de saída exclusiva para a NBA
-            final_path = os.path.join(base_path, 'data', 'nba_experimento_03_minuto', temporada_atual, f'{indice}-1')
+    indice = qtd_jogos_base
+    num_arquivo = 1
 
-            # Salva os arquivos iterativos
-            save_to_csv(treino_atual, os.path.join(final_path, f'treino_{num_arquivo}.csv'))
-            save_to_csv(teste_atual, os.path.join(final_path, f'teste_{num_arquivo}.csv'))
+    # 3. Gera os arquivos incrementais para a temporada atual
+    while indice < len(jogos_atual_treino_fmt):
+        # Treino = Histórico das temporadas passadas + Jogos da temporada atual até o 'indice'
+        treino_atual_parcial = descompactar_estatisticas(jogos_atual_treino_fmt[0:indice])
+        treino_completo = jogos_treino_passados_formatados + treino_atual_parcial
 
-            indice += 1
-            num_arquivo += 1
+        # Teste = Apens o jogo de teste do 'indice'
+        teste = descompactar_estatisticas([jogos_atual_teste_fmt[indice]])
 
-    print("\n>> Extração por minuto da NBA (Experimento 3) finalizada com sucesso!")
+        # MUDANÇA AQUI: Alterada a pasta de salvamento para experimento_05_minuto
+        final_path = os.path.join(base_path, 'data', 'experimento_05_minuto', temporada_atual, f'{indice}-1')
+
+        save_to_csv(treino_completo, f'{final_path}/treino_{num_arquivo}.csv')
+        save_to_csv(teste, f'{final_path}/teste_{num_arquivo}.csv')
+
+        indice += 1
+        num_arquivo += 1
+
+    print(f"-> Concluído: {temporada_atual} | Treino base com {len(temporadas_passadas)} temporadas passadas.")
 
 
 if __name__ == "__main__":
-    # Ajuste as temporadas conforme os dados que você subiu no nba_db
-    temporadas_nba = [
-        '2008-09', '2009-10', '2010-11', '2011-12',
-        '2012-13', '2013-14', '2014-15', '2015-16',
-        '2016-17', '2017-18', '2018-19', '2019-20',
-        '2020-21', '2021-22', '2022-23', '2023-24'
+    temporadas = [
+        '2008-2009', '2009-2010', '2011-2012', '2012-2013',
+        '2013-2014', '2014-2015', '2015-2016', '2016-2017', 
+        '2018-2019', '2019-2020', '2020-2021', '2021-2022', 
+        '2022-2023', '2023-2024', '2024-2025'
     ]
 
-    base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    
-    # K=15 (se for outro valor para a média dos jogos recentes do time, basta alterar aqui)
+    base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..','..'))
     qtd_jogos_base = 15
 
-    gerar_arquivos_acumulada_intratemporada(temporadas_nba, base_path, qtd_jogos_base)
+    print(">> Iniciando a extração do Experimento 05 (Combinatório por Minuto)...")
+    
+    # A partir da 2ª temporada (índice 1), a temporada atual ganha o histórico de todas as anteriores
+    for i in range(1, len(temporadas)):
+        temps_passadas = temporadas[:i]
+        temp_atual = temporadas[i]
+
+        gerar_arquivos_inter_incremental(temps_passadas, temp_atual, qtd_jogos_base, base_path)
+        
+    print("\n>> Extração por minuto do Experimento 5 finalizada com sucesso!")
