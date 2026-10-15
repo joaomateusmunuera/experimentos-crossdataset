@@ -22,13 +22,12 @@ from regressao_logistica_model import run_model_logreg
 
 from experimentos import save_results_csv
 
-# Experimento Cross-Dataset (Treino NBB -> Teste NBA)
+# Experimento Cross-Dataset (Treino NBB -> Teste NBA e vice-versa)
 
-modelos = ['svm', 'regressao_logistica', 'cart_model', 'xgboost', 'random_forest']
+modelos = ['regressao_logistica', 'xgboost']
 jogos_media = '15' 
-janelas = [f"janela_{i:02d}" for i in range(1, 14)]
+janelas = [f"janela_{i:02d}" for i in range(1, 15)]
 
-# Como o script está em 'nba-nbb/scripts/crossdata/', precisamos subir DOIS níveis para chegar na raiz 'nba-nbb/'
 base_path = os.path.abspath(os.path.join(current_dir, '..', '..'))
 start_time = time.time()
 
@@ -39,9 +38,9 @@ for modelo in modelos:
     historico_hiperparametros = []
 
     for janela in janelas:
-        # Aponta para a raiz do projeto -> data/cross_dataset_minuto/...
-        treino_path = os.path.join(base_path, "data", "cross_dataset_minuto", jogos_media, janela, "treino_nbb.csv")
-        teste_path = os.path.join(base_path, "data", "cross_dataset_minuto", jogos_media, janela, "teste_nba.csv")
+        # Treinando com a NBA e testando com NBB, para o inverso, alterar a pasta de origem
+        treino_path = os.path.join(base_path, "data", "cross_dataset_nbb_para_nba", jogos_media, janela, "treino_nbb.csv")
+        teste_path = os.path.join(base_path, "data", "cross_dataset_nbb_para_nba", jogos_media, janela, "teste_nba.csv")
 
         print(f"Rodando Cross-Dataset: {modelo.upper()} | Média: {jogos_media} | {janela}")
         
@@ -103,8 +102,8 @@ for modelo in modelos:
             'Desvio Padrão F1-Score': f'{desvio_padrao_f1_score:.2f}',
         })
 
-    # Salvando os resultados na pasta results/ da raiz do projeto
-    output_dir = os.path.join(base_path, 'results', 'cross_dataset_minuto')
+    # Salvando os resultados na pasta results/ da raiz do projeto. Alterar pasta de resultados dependendo da liga
+    output_dir = os.path.join(base_path, 'results', 'cross_dataset_minuto_nbb_nba')
     os.makedirs(output_dir, exist_ok=True)
 
     path_resultados = os.path.join(output_dir, f'{modelo}_cross_dataset_{jogos_media}_minuto.csv')
