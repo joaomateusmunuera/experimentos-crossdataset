@@ -103,7 +103,7 @@ for modelo in modelos:
         })
 
     # Salvando os resultados na pasta results/ da raiz do projeto. Alterar pasta de resultados dependendo da liga
-    output_dir = os.path.join(base_path, 'results', 'cross_dataset_minuto_nba_nbb')
+    output_dir = os.path.join(base_path, 'results', 'treina_nba_testa_nbb')
     os.makedirs(output_dir, exist_ok=True)
 
     path_resultados = os.path.join(output_dir, f'{modelo}_cross_dataset_{jogos_media}_minuto.csv')
