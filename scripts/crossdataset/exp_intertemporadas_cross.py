@@ -24,7 +24,7 @@ from experimentos import save_results_csv
 
 # Experimento Cross-Dataset (Treino NBB -> Teste NBA e vice-versa)
 
-modelos = ['regressao_logistica', 'xgboost']
+modelos = ['rede_neural']
 jogos_media = '15' 
 janelas = [f"janela_{i:02d}" for i in range(1, 15)]
 
@@ -39,8 +39,8 @@ for modelo in modelos:
 
     for janela in janelas:
         # Treinando com a NBA e testando com NBB, para o inverso, alterar a pasta de origem
-        treino_path = os.path.join(base_path, "data", "cross_dataset_nbb_para_nba", jogos_media, janela, "treino_nbb.csv")
-        teste_path = os.path.join(base_path, "data", "cross_dataset_nbb_para_nba", jogos_media, janela, "teste_nba.csv")
+        treino_path = os.path.join(base_path, "data", "cross_dataset_nba_para_nbb", jogos_media, janela, "treino_nba.csv")
+        teste_path = os.path.join(base_path, "data", "cross_dataset_nba_para_nbb", jogos_media, janela, "teste_nbb.csv")
 
         print(f"Rodando Cross-Dataset: {modelo.upper()} | Média: {jogos_media} | {janela}")
         
@@ -103,7 +103,7 @@ for modelo in modelos:
         })
 
     # Salvando os resultados na pasta results/ da raiz do projeto. Alterar pasta de resultados dependendo da liga
-    output_dir = os.path.join(base_path, 'results', 'cross_dataset_minuto_nbb_nba')
+    output_dir = os.path.join(base_path, 'results', 'cross_dataset_minuto_nba_nbb')
     os.makedirs(output_dir, exist_ok=True)
 
     path_resultados = os.path.join(output_dir, f'{modelo}_cross_dataset_{jogos_media}_minuto.csv')

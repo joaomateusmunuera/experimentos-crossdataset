@@ -12,11 +12,13 @@ if scripts_dir not in sys.path:
 
 # Importações dos classificadores
 from xgboost_model import run_model_xgboost
+from rede_neural import run_model_rede_neural
 from regressao_logistica_model import run_model_logreg
 from experimentos import save_results_csv
 
+
 # Configurações do Experimento Misto (Joint Training)
-modelos = ['regressao_logistica', 'xgboost']
+modelos = ['rede_neural']
 jogos_media = '15' 
 janelas = [f"janela_{i:02d}" for i in range(1, 15)]
 
@@ -33,7 +35,8 @@ for modelo in modelos:
         
         path_treino_nba = os.path.join(base_path, "data", "cross_dataset_nba_para_nbb", jogos_media, janela, "treino_nba.csv")
         path_treino_nbb = os.path.join(base_path, "data", "cross_dataset_nbb_para_nba", jogos_media, janela, "treino_nbb.csv")
-        path_teste_nbb  = os.path.join(base_path, "data", "cross_dataset_nba_para_nbb", jogos_media, janela, "teste_nbb.csv")
+       # path_teste_nbb  = os.path.join(base_path, "data", "cross_dataset_nba_para_nbb", jogos_media, janela, "teste_nbb.csv")
+        path_teste_nbb  = os.path.join(base_path, "data", "cross_dataset_nbb_para_nba", jogos_media, janela, "teste_nba.csv")
 
         accuracy = None
         f1 = None
@@ -60,7 +63,8 @@ for modelo in modelos:
             df_misto = pd.concat([df_nba, df_nbb], ignore_index=True)
             
             # Cria uma pasta para os dados mistos e salva o ficheiro
-            pasta_mista = os.path.join(base_path, "data", "experimento_misto", jogos_media, janela)
+         #   pasta_mista = os.path.join(base_path, "data", "experimento_misto_nba", jogos_media, janela)
+            pasta_mista = os.path.join(base_path, "data", "experimento_misto_nbb", jogos_media, janela)
             os.makedirs(pasta_mista, exist_ok=True)
             path_treino_misto = os.path.join(pasta_mista, "treino_misto.csv")
             df_misto.to_csv(path_treino_misto, index=False)
@@ -70,6 +74,8 @@ for modelo in modelos:
                 accuracy, f1, best_params = run_model_xgboost(path_treino_misto, path_teste_nbb, True)
             elif modelo == 'regressao_logistica':
                 accuracy, f1, best_params = run_model_logreg(path_treino_misto, path_teste_nbb, True)
+            elif modelo == 'rede_neural':
+                accuracy, f1, best_params = run_model_rede_neural(path_treino_misto, path_teste_nbb, True)
 
             if accuracy is not None and f1 is not None:
                 acuracias_do_experimento.append(accuracy)
@@ -96,9 +102,11 @@ for modelo in modelos:
             'Desvio Padrão F1-Score': f'{np.std(f1_scores_do_experimento):.2f}',
         })
 
-    output_dir = os.path.join(base_path, 'results', 'treino_misto')
+ #   output_dir = os.path.join(base_path, 'results', 'treino_misto_nba')
+    output_dir = os.path.join(base_path, 'results', 'treino_misto_nbb')
     os.makedirs(output_dir, exist_ok=True)
-    path_resultados = os.path.join(output_dir, f'{modelo}_treino_misto_{jogos_media}_minuto.csv')
+    #path_resultados = os.path.join(output_dir, f'{modelo}_treino_misto_nba_{jogos_media}_minuto.csv')
+    path_resultados = os.path.join(output_dir, f'{modelo}_treino_misto_nbb_{jogos_media}_minuto.csv')
     
     save_results_csv(path_resultados, results)
     print(f"\n>> Resultados mistos guardados em: {path_resultados}")
