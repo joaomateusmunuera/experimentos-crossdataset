@@ -14,11 +14,13 @@ if scripts_dir not in sys.path:
 from xgboost_model import run_model_xgboost
 from rede_neural import run_model_rede_neural
 from regressao_logistica_model import run_model_logreg
+from random_forest import run_model_rf
 from experimentos import save_results_csv
 
 
+
 # Configurações do Experimento Misto (Joint Training)
-modelos = ['rede_neural']
+modelos = ['random_forest']
 jogos_media = '15' 
 janelas = [f"janela_{i:02d}" for i in range(1, 15)]
 
@@ -35,8 +37,8 @@ for modelo in modelos:
         
         path_treino_nba = os.path.join(base_path, "data", "cross_dataset_nba_para_nbb", jogos_media, janela, "treino_nba.csv")
         path_treino_nbb = os.path.join(base_path, "data", "cross_dataset_nbb_para_nba", jogos_media, janela, "treino_nbb.csv")
-       # path_teste_nbb  = os.path.join(base_path, "data", "cross_dataset_nba_para_nbb", jogos_media, janela, "teste_nbb.csv")
-        path_teste_nbb  = os.path.join(base_path, "data", "cross_dataset_nbb_para_nba", jogos_media, janela, "teste_nba.csv")
+        path_teste_nbb  = os.path.join(base_path, "data", "cross_dataset_nba_para_nbb", jogos_media, janela, "teste_nbb.csv")
+     #   path_teste_nbb  = os.path.join(base_path, "data", "cross_dataset_nbb_para_nba", jogos_media, janela, "teste_nba.csv")
 
         accuracy = None
         f1 = None
@@ -76,6 +78,8 @@ for modelo in modelos:
                 accuracy, f1, best_params = run_model_logreg(path_treino_misto, path_teste_nbb, True)
             elif modelo == 'rede_neural':
                 accuracy, f1, best_params = run_model_rede_neural(path_treino_misto, path_teste_nbb, True)
+            elif modelo == 'random_forest':
+                accuracy, f1, best_params = run_model_rf(path_treino_misto, path_teste_nbb, True)
 
             if accuracy is not None and f1 is not None:
                 acuracias_do_experimento.append(accuracy)
@@ -105,7 +109,7 @@ for modelo in modelos:
  #   output_dir = os.path.join(base_path, 'results', 'treino_misto_nba')
     output_dir = os.path.join(base_path, 'results', 'treino_misto_nbb')
     os.makedirs(output_dir, exist_ok=True)
-    #path_resultados = os.path.join(output_dir, f'{modelo}_treino_misto_nba_{jogos_media}_minuto.csv')
+ #   path_resultados = os.path.join(output_dir, f'{modelo}_treino_misto_nba_{jogos_media}_minuto.csv')
     path_resultados = os.path.join(output_dir, f'{modelo}_treino_misto_nbb_{jogos_media}_minuto.csv')
     
     save_results_csv(path_resultados, results)
