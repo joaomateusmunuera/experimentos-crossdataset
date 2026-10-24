@@ -7,7 +7,6 @@ __pycache__/
 *.so
 
 #Dados das temporadas
-data/
 debug_banco.py
 
 # Distribution / packaging
